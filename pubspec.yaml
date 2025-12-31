@@ -1,0 +1,49 @@
+name: techfis_asset_management_mobile
+description: Mobile application for Techfis Asset Management built with Flutter.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # State Management
+  flutter_bloc: ^8.1.0
+  equatable: ^2.0.5
+  
+  # Navigation
+  go_router: ^12.0.0
+  
+  # Dependency Injection
+  get_it: ^7.6.0
+  injectable: ^2.3.2
+  
+  # Networking
+  dio: ^5.3.0
+  
+  # Utility
+  dartz: ^0.10.1
+  json_annotation: ^4.8.1
+  google_fonts: ^6.1.0
+  flutter_svg: ^2.0.9
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  
+  # Code Generation
+  build_runner: ^2.4.6
+  injectable_generator: ^2.4.1
+  json_serializable: ^6.7.1
+  
+  # Linter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/icons/

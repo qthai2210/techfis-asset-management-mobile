@@ -19,29 +19,29 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final response = await remoteDataSource.login(username, password);
       final data = response['data'];
-      
+
       await storage.write(key: 'accessToken', value: data['accessToken']);
       await storage.write(key: 'refreshToken', value: data['refreshToken']);
-      
+
       final user = await remoteDataSource.getCurrentUser();
       return Right(user);
     } on ServerException {
       return const Left(ServerFailure('Authentication failed'));
     } catch (e) {
-         return Left(ServerFailure(e.toString()));
+      return Left(ServerFailure(e.toString()));
     }
   }
 
   @override
-  Future<Either<Failure, void>> logout() async {
+  Future<Either<Failure, Unit>> logout() async {
     try {
       await remoteDataSource.logout();
       await storage.deleteAll();
-      return const Right(null);
+      return const Right(unit);
     } catch (e) {
       // Force clear local storage
       await storage.deleteAll();
-       return const Right(null);
+      return const Right(unit);
     }
   }
 

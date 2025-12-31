@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../injection_container.dart';
+
 import '../bloc/auth_bloc.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
 
   @override
+  @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => getIt<AuthBloc>(),
-      child: const _LoginForm(),
-    );
+    return const _LoginForm();
   }
 }
 
@@ -72,7 +70,8 @@ class _LoginFormState extends State<_LoginForm> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const Icon(Icons.lock_person, size: 80, color: Colors.blue),
+                    Icon(Icons.lock_person,
+                        size: 80, color: Theme.of(context).primaryColor),
                     const SizedBox(height: 32),
                     Text(
                       'Welcome Back',

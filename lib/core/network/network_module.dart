@@ -1,10 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 
+import 'auth_interceptor.dart';
+
 @module
 abstract class NetworkModule {
   @lazySingleton
-  Dio get dio {
+  Dio dio(AuthInterceptor authInterceptor) {
     final dio = Dio(
       BaseOptions(
         baseUrl: 'http://10.0.2.2:3000/api/v1', // Android Emulator localhost
@@ -17,6 +19,7 @@ abstract class NetworkModule {
       ),
     );
 
+    dio.interceptors.add(authInterceptor);
     dio.interceptors.add(LogInterceptor(responseBody: true, requestBody: true));
     return dio;
   }

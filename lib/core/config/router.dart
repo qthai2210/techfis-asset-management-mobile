@@ -1,9 +1,10 @@
 import 'package:go_router/go_router.dart';
-import 'package:flutter/material.dart';
+
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/bloc/auth_bloc.dart';
 import '../utils/go_router_refresh_stream.dart';
 import '../../injection_container.dart';
+import '../../features/dashboard/presentation/pages/dashboard_page.dart';
 
 final router = GoRouter(
   initialLocation: '/',
@@ -19,13 +20,12 @@ final router = GoRouter(
   },
   routes: [
     GoRoute(
-      path: '/login',
-      builder: (context, state) => const LoginPage(),
+      path: '/',
+      builder: (context, state) => const DashboardPage(),
     ),
     GoRoute(
-      path: '/',
-      builder: (context, state) =>
-          const Scaffold(body: Center(child: Text('Dashboard (Protected)'))),
+      path: '/login',
+      builder: (context, state) => const LoginPage(),
     ),
   ],
 );

@@ -1,2 +1,28 @@
-class ServerException implements Exception {}
-class CacheException implements Exception {}
+class ServerException implements Exception {
+  final String message;
+  final int? statusCode;
+
+  ServerException({
+    this.message = 'Server error occurred',
+    this.statusCode,
+  });
+
+  @override
+  String toString() => message;
+}
+
+class AuthException implements Exception {
+  final String message;
+  AuthException({this.message = 'Authentication failed'});
+
+  @override
+  String toString() => message;
+}
+
+class CacheException implements Exception {
+  final String message;
+  CacheException({this.message = 'Cache error occurred'});
+
+  @override
+  String toString() => message;
+}

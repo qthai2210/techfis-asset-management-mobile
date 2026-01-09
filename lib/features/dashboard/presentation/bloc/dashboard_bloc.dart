@@ -1,8 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
-import '../../../../core/usecases/usecase.dart';
-import '../../domain/usecases/get_dashboard_data_usecase.dart';
+import 'package:techfis_asset_management_mobile/core/usecases/usecase.dart';
+import 'package:techfis_asset_management_mobile/features/dashboard/domain/usecases/get_dashboard_data_usecase.dart';
 
 // EVENTS
 abstract class DashboardEvent extends Equatable {

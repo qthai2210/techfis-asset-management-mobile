@@ -1,63 +1,56 @@
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import '../../../../core/error/exceptions.dart';
-import '../../../../core/error/failures.dart';
-import '../../domain/entities/user.dart';
-import '../../domain/repositories/auth_repository.dart';
-import '../datasources/auth_remote_data_source.dart';
+import 'package:techfis_asset_management_mobile/core/error/failures.dart';
+import 'package:techfis_asset_management_mobile/core/constants/storage_keys.dart';
+import 'package:techfis_asset_management_mobile/features/auth/domain/entities/user.dart';
+import 'package:techfis_asset_management_mobile/features/auth/domain/repositories/auth_repository.dart';
+import 'package:techfis_asset_management_mobile/features/auth/data/datasources/auth_remote_data_source.dart';
+import 'package:techfis_asset_management_mobile/core/error/error_handler.dart';
 
 @LazySingleton(as: AuthRepository)
-class AuthRepositoryImpl implements AuthRepository {
-  final AuthRemoteDataSource remoteDataSource;
-  final FlutterSecureStorage storage;
+class AuthRepositoryImpl with ErrorHandler implements AuthRepository {
+  final AuthRemoteDataSource _remoteDataSource;
+  final FlutterSecureStorage _storage;
 
-  AuthRepositoryImpl(this.remoteDataSource, this.storage);
+  AuthRepositoryImpl(this._remoteDataSource, this._storage);
 
   @override
   Future<Either<Failure, User>> login(String username, String password) async {
-    try {
-      final response = await remoteDataSource.login(username, password);
+    return handleRepositoryCall(() async {
+      final response = await _remoteDataSource.login(username, password);
       final data = response['data'];
 
-      await storage.write(key: 'accessToken', value: data['accessToken']);
-      await storage.write(key: 'refreshToken', value: data['refreshToken']);
+      await _storage.write(
+          key: StorageKeys.accessToken, value: data['accessToken']);
+      await _storage.write(
+          key: StorageKeys.refreshToken, value: data['refreshToken']);
 
-      final user = await remoteDataSource.getCurrentUser();
-      return Right(user);
-    } on ServerException {
-      return const Left(ServerFailure('Authentication failed'));
-    } catch (e) {
-      return Left(ServerFailure(e.toString()));
-    }
+      return await _remoteDataSource.getCurrentUser();
+    });
   }
 
   @override
   Future<Either<Failure, Unit>> logout() async {
     try {
-      await remoteDataSource.logout();
-      await storage.deleteAll();
+      await _remoteDataSource.logout();
+      await _storage.deleteAll();
       return const Right(unit);
     } catch (e) {
       // Force clear local storage
-      await storage.deleteAll();
+      await _storage.deleteAll();
       return const Right(unit);
     }
   }
 
   @override
   Future<Either<Failure, User>> getCurrentUser() async {
-    try {
-      final user = await remoteDataSource.getCurrentUser();
-      return Right(user);
-    } on ServerException {
-      return const Left(ServerFailure('Failed to get user'));
-    }
+    return handleRepositoryCall(() => _remoteDataSource.getCurrentUser());
   }
 
   @override
   Future<Either<Failure, bool>> checkAuthStatus() async {
-    final token = await storage.read(key: 'accessToken');
+    final token = await _storage.read(key: StorageKeys.accessToken);
     if (token != null) {
       return const Right(true);
     }

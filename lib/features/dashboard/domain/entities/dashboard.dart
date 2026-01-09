@@ -98,3 +98,61 @@ class AssignmentReport extends Equatable {
   List<Object?> get props =>
       [id, assetCode, assetName, assignedTo, status, createdAt];
 }
+
+class InvoiceMetrics extends Equatable {
+  final int total;
+  final int totalPaid;
+  final int totalPending;
+  final int totalOverdue;
+  final int totalDraft;
+
+  const InvoiceMetrics({
+    required this.total,
+    required this.totalPaid,
+    required this.totalPending,
+    required this.totalOverdue,
+    required this.totalDraft,
+  });
+
+  @override
+  List<Object?> get props =>
+      [total, totalPaid, totalPending, totalOverdue, totalDraft];
+}
+
+class MaintenanceMetrics extends Equatable {
+  final int total;
+  final int totalCompleted;
+  final int totalInProgress;
+  final int totalScheduled;
+  final int totalFailed;
+
+  const MaintenanceMetrics({
+    required this.total,
+    required this.totalCompleted,
+    required this.totalInProgress,
+    required this.totalScheduled,
+    required this.totalFailed,
+  });
+
+  @override
+  List<Object?> get props =>
+      [total, totalCompleted, totalInProgress, totalScheduled, totalFailed];
+}
+
+class AssignmentMetrics extends Equatable {
+  final int total;
+  final int totalAccepted;
+  final int totalPending;
+  final int totalRejected;
+
+  const AssignmentMetrics({
+    required this.total,
+    required this.totalAccepted,
+    required this.totalPending,
+    required this.totalRejected,
+  });
+
+  @override
+  List<Object?> get props =>
+      [total, totalAccepted, totalPending, totalRejected];
+}

@@ -1,8 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:injectable/injectable.dart';
-import '../../../../core/error/exceptions.dart';
-import '../models/user_model.dart';
+import 'package:techfis_asset_management_mobile/core/error/exceptions.dart';
+import 'package:techfis_asset_management_mobile/core/constants/api_constants.dart';
+import 'package:techfis_asset_management_mobile/features/auth/data/models/user_model.dart';
 
 abstract class AuthRemoteDataSource {
   Future<Map<String, dynamic>> login(String username, String password);
@@ -20,7 +21,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<Map<String, dynamic>> login(String username, String password) async {
     try {
-      final response = await client.post('/auth/login', data: {
+      final response = await client.post(ApiConstants.login, data: {
         'username': username,
         'password': password,
       });
@@ -28,33 +29,37 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       if (response.statusCode == 200 || response.statusCode == 201) {
         return response.data;
       } else {
-        throw ServerException();
+        throw ServerException(message: 'Login failed');
       }
-    } on DioException {
-      throw ServerException();
+    } on DioException catch (e) {
+      throw ServerException(
+        message: e.response?.data['message'] ?? 'Authentication failed',
+      );
     }
   }
 
   @override
   Future<void> logout() async {
     try {
-      await client.post('/auth/logout');
+      await client.post(ApiConstants.logout);
     } catch (_) {
-      // Ignore logout errors
+      // Ignore logout errors - local cleanup is more important
     }
   }
 
   @override
   Future<UserModel> getCurrentUser() async {
     try {
-      final response = await client.get('/auth/me');
+      final response = await client.get(ApiConstants.me);
       if (response.statusCode == 200) {
         return UserModel.fromJson(response.data['data']);
       } else {
-        throw ServerException();
+        throw ServerException(message: 'Failed to get user info');
       }
-    } on DioException {
-      throw ServerException();
+    } on DioException catch (e) {
+      throw ServerException(
+        message: e.response?.data['message'] ?? 'Failed to get user info',
+      );
     }
   }
 }

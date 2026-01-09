@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
+import 'package:intl/intl.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:techfis_asset_management_mobile/core/constants/app_colors.dart';
+import 'package:techfis_asset_management_mobile/core/presentation/widgets/shimmer_loading.dart';
+import 'package:techfis_asset_management_mobile/features/dashboard/presentation/widgets/doughnut_chart_widget.dart';
+import 'package:techfis_asset_management_mobile/features/dashboard/presentation/widgets/gradient_stat_card.dart';
 import 'package:techfis_asset_management_mobile/injection_container.dart';
-import '../bloc/dashboard_bloc.dart';
-import '../widgets/stat_card.dart';
-import '../widgets/asset_status_chart.dart';
-import '../widgets/recent_assignments_list.dart';
-import '../../../../core/config/theme.dart';
+import 'package:techfis_asset_management_mobile/core/presentation/widgets/app_drawer.dart';
+import 'package:techfis_asset_management_mobile/core/presentation/widgets/app_state_display.dart';
+import 'package:techfis_asset_management_mobile/core/utils/error_translator.dart';
+import 'package:techfis_asset_management_mobile/features/dashboard/presentation/bloc/dashboard_bloc.dart';
+import 'package:techfis_asset_management_mobile/features/dashboard/presentation/widgets/recent_assignments_list.dart';
 
 class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});
@@ -24,11 +29,46 @@ class DashboardPage extends StatelessWidget {
 class _DashboardView extends StatelessWidget {
   const _DashboardView();
 
+  Color _getStatusColor(String status) {
+    switch (status.toUpperCase()) {
+      case 'ACTIVE':
+        return AppColors.active;
+      case 'INACTIVE':
+        return AppColors.inactive;
+      case 'UNDER_MAINTENANCE':
+      case 'MAINTENANCE':
+        return AppColors.maintenance;
+      case 'DISPOSED':
+        return AppColors.disposed;
+      case 'BROKEN':
+        return AppColors.broken;
+      default:
+        return AppColors.info;
+    }
+  }
+
+  String _formatCurrency(double value, String locale) {
+    try {
+      final format = NumberFormat.currency(
+          symbol: locale == 'vi' ? 'đ' : '\$',
+          locale: locale == 'vi' ? 'vi_VN' : 'en_US',
+          decimalDigits: 0);
+      return format.format(value);
+    } catch (_) {
+      final symbol = locale == 'vi' ? 'đ' : '\$';
+      return '${value.toStringAsFixed(0)} $symbol';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final locale = Localizations.localeOf(context).languageCode;
+
     return Scaffold(
+      drawer: const AppDrawer(),
       appBar: AppBar(
-        title: const Text('Dashboard'),
+        title: Text(l10n.dashboard),
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications_outlined),
@@ -47,27 +87,32 @@ class _DashboardView extends StatelessWidget {
         child: BlocBuilder<DashboardBloc, DashboardState>(
           builder: (context, state) {
             if (state is DashboardLoading) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (state is DashboardError) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.error_outline,
-                        size: 48, color: Colors.red),
-                    const SizedBox(height: 16),
-                    Text(state.message),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () {
-                        context
-                            .read<DashboardBloc>()
-                            .add(DashboardLoadRequested());
-                      },
-                      child: const Text('Retry'),
-                    ),
-                  ],
+              return const SingleChildScrollView(
+                padding: EdgeInsets.all(16.0),
+                child: ShimmerLoading(
+                  child: Column(
+                    children: [
+                      ShimmerPlaceholder(
+                          width: 120,
+                          height: 28,
+                          margin: EdgeInsets.only(bottom: 16)),
+                      DashboardStatShimmer(),
+                      SizedBox(height: 24),
+                      DashboardChartShimmer(),
+                      SizedBox(height: 24),
+                      DashboardChartShimmer(),
+                    ],
+                  ),
                 ),
+              );
+            } else if (state is DashboardError) {
+              return AppStateDisplay.error(
+                title: l10n.serverError,
+                description: context.translateError(state.message),
+                buttonLabel: l10n.retry,
+                onButtonPressed: () {
+                  context.read<DashboardBloc>().add(DashboardLoadRequested());
+                },
               );
             } else if (state is DashboardLoaded) {
               final data = state.data;
@@ -77,9 +122,8 @@ class _DashboardView extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Welcome Section
                     Text(
-                      'Overview',
+                      l10n.overview,
                       style:
                           Theme.of(context).textTheme.headlineSmall?.copyWith(
                                 fontWeight: FontWeight.bold,
@@ -87,39 +131,42 @@ class _DashboardView extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
 
-                    // Main Stats Grid
+                    // Main Stats Grid (2x2)
                     GridView.count(
                       crossAxisCount: 2,
                       crossAxisSpacing: 16,
                       mainAxisSpacing: 16,
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      childAspectRatio: 1.5,
+                      childAspectRatio: 1.0,
                       children: [
-                        StatCard(
-                          label: 'Total Assets',
+                        GradientStatCard(
+                          title: l10n.totalAssets,
                           value: data.summary.totalAssets.toString(),
                           icon: Icons.inventory_2,
-                          color: AppTheme.primaryColor,
-                          onTap: () {}, // Navigate to Asset List
+                          gradientColors: AppColors.blueGradient,
+                          subtitle:
+                              '${data.summary.activeAssets} ${l10n.active}',
                         ),
-                        StatCard(
-                          label: 'Active',
-                          value: data.summary.activeAssets.toString(),
-                          icon: Icons.check_circle,
-                          color: Colors.green,
+                        GradientStatCard(
+                          title: l10n.totalValue,
+                          value: _formatCurrency(
+                              data.summary.totalAssetValue, locale),
+                          icon: Icons.attach_money,
+                          gradientColors: AppColors.greenGradient,
                         ),
-                        StatCard(
-                          label: 'Inactive',
-                          value: data.summary.inactiveAssets.toString(),
-                          icon: Icons.cancel,
-                          color: Colors.red,
+                        GradientStatCard(
+                          title: l10n.maintenance,
+                          value: _formatCurrency(
+                              data.summary.totalMaintenanceCost, locale),
+                          icon: Icons.build,
+                          gradientColors: AppColors.orangeGradient,
                         ),
-                        StatCard(
-                          label: 'Users',
+                        GradientStatCard(
+                          title: l10n.users,
                           value: data.summary.userCount.toString(),
                           icon: Icons.people,
-                          color: AppTheme.secondaryColor,
+                          gradientColors: AppColors.purpleGradient,
                         ),
                       ],
                     ),
@@ -127,51 +174,150 @@ class _DashboardView extends StatelessWidget {
                     const SizedBox(height: 24),
 
                     // Asset Status Section
-                    const _SectionHeader(title: 'Asset Status'),
+                    _SectionHeader(title: l10n.assetStatus),
                     const SizedBox(height: 12),
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.1),
-                            blurRadius: 10,
-                          ),
-                        ],
+                    Card(
+                      elevation: 2,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: DoughnutChartWidget(
+                          data: data.assetsByStatus
+                              .map((e) => DoughnutChartData(
+                                    e.status,
+                                    e.count.toDouble(),
+                                    _getStatusColor(e.status),
+                                  ))
+                              .toList(),
+                          centerText: data.summary.totalAssets.toString(),
+                          centerLabel: l10n.assets,
+                        ),
                       ),
-                      child: AssetStatusChart(data: data.assetsByStatus),
                     ),
 
                     const SizedBox(height: 24),
 
-                    // Recent Assignments
+                    // Assignments Section
                     _SectionHeader(
-                      title: 'Recent Assignments',
+                      title: l10n.assignments,
                       action: TextButton(
                         onPressed: () {},
-                        child: const Text('View All'),
+                        child: Text(l10n.viewAll),
                       ),
                     ),
                     const SizedBox(height: 12),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.1),
-                            blurRadius: 10,
-                          ),
-                        ],
+                    Card(
+                      elevation: 2,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          children: [
+                            DoughnutChartWidget(
+                              data: [
+                                DoughnutChartData(
+                                    l10n.accepted,
+                                    data.assignmentMetrics.totalAccepted
+                                        .toDouble(),
+                                    AppColors.success),
+                                DoughnutChartData(
+                                    l10n.pending,
+                                    data.assignmentMetrics.totalPending
+                                        .toDouble(),
+                                    AppColors.warning),
+                                DoughnutChartData(
+                                    l10n.rejected,
+                                    data.assignmentMetrics.totalRejected
+                                        .toDouble(),
+                                    AppColors.error),
+                              ],
+                              centerText:
+                                  data.assignmentMetrics.total.toString(),
+                              centerLabel: l10n.total,
+                            ),
+                            const Divider(height: 32),
+                            RecentAssignmentsList(
+                                assignments: data.recentAssignments),
+                          ],
+                        ),
                       ),
-                      padding: const EdgeInsets.all(16),
-                      child: RecentAssignmentsList(
-                          assignments: data.recentAssignments),
                     ),
 
                     const SizedBox(height: 24),
+
+                    // Maintenance Section
+                    _SectionHeader(title: l10n.maintenanceStatus),
+                    const SizedBox(height: 12),
+                    Card(
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
+                        child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: DoughnutChartWidget(
+                              data: [
+                                DoughnutChartData(
+                                    l10n.completed,
+                                    data.maintenanceMetrics.totalCompleted
+                                        .toDouble(),
+                                    AppColors.success),
+                                DoughnutChartData(
+                                    l10n.inProgress,
+                                    data.maintenanceMetrics.totalInProgress
+                                        .toDouble(),
+                                    AppColors.info),
+                                DoughnutChartData(
+                                    l10n.scheduled,
+                                    data.maintenanceMetrics.totalScheduled
+                                        .toDouble(),
+                                    AppColors.warning),
+                                DoughnutChartData(
+                                    l10n.failed,
+                                    data.maintenanceMetrics.totalFailed
+                                        .toDouble(),
+                                    AppColors.error),
+                              ],
+                              centerText:
+                                  data.maintenanceMetrics.total.toString(),
+                              centerLabel: l10n.tasks,
+                            ))),
+
+                    const SizedBox(height: 24),
+
+                    // Invoices Section
+                    _SectionHeader(title: l10n.invoiceStatus),
+                    const SizedBox(height: 12),
+                    Card(
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
+                        child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: DoughnutChartWidget(
+                              data: [
+                                DoughnutChartData(
+                                    l10n.paid,
+                                    data.invoiceMetrics.totalPaid.toDouble(),
+                                    AppColors.success),
+                                DoughnutChartData(
+                                    l10n.pending,
+                                    data.invoiceMetrics.totalPending.toDouble(),
+                                    AppColors.warning),
+                                DoughnutChartData(
+                                    l10n.overdue,
+                                    data.invoiceMetrics.totalOverdue.toDouble(),
+                                    AppColors.error),
+                                DoughnutChartData(
+                                    l10n.draft,
+                                    data.invoiceMetrics.totalDraft.toDouble(),
+                                    AppColors.disposed),
+                              ],
+                              centerText: data.invoiceMetrics.total.toString(),
+                              centerLabel: l10n.invoices,
+                            ))),
+                    const SizedBox(height: 32),
                   ],
                 ),
               );

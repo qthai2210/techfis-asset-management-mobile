@@ -1,9 +1,9 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:injectable/injectable.dart';
-import '../../domain/entities/user.dart';
-import '../../domain/usecases/login_usecase.dart';
-import '../../domain/repositories/auth_repository.dart';
+import 'package:techfis_asset_management_mobile/features/auth/domain/entities/user.dart';
+import 'package:techfis_asset_management_mobile/features/auth/domain/usecases/login_usecase.dart';
+import 'package:techfis_asset_management_mobile/features/auth/domain/repositories/auth_repository.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';

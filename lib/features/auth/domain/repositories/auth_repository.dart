@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
-import '../../../../core/error/failures.dart';
-import '../entities/user.dart';
+import 'package:techfis_asset_management_mobile/core/error/failures.dart';
+import 'package:techfis_asset_management_mobile/features/auth/domain/entities/user.dart';
 
 abstract class AuthRepository {
   Future<Either<Failure, User>> login(String username, String password);

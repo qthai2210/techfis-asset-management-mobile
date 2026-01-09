@@ -1,40 +1,62 @@
-import '../../domain/entities/user.dart';
+// ignore_for_file: invalid_annotation_target
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:techfis_asset_management_mobile/features/auth/domain/entities/user.dart';
 
-class UserModel extends User {
-  const UserModel({
-    required super.id,
-    required super.fullName,
-    required super.email,
-    required super.employeeCode,
-    super.avatarUrl,
-    super.departmentId,
-    super.position,
-    required super.role,
-  });
+part 'user_model.freezed.dart';
+part 'user_model.g.dart';
 
-  factory UserModel.fromJson(Map<String, dynamic> json) {
-    return UserModel(
-      id: json['id'].toString(),
-      fullName: json['full_name'] ?? '',
-      email: json['email'] ?? '',
-      employeeCode: json['employee_code'] ?? '',
-      avatarUrl: json['avatar_url'],
-      departmentId: json['department_id']?.toString(),
-      position: json['position'],
-      role: json['account']?['role'] ?? 'USER',
-    );
+@freezed
+abstract class UserModel with _$UserModel implements User {
+  const UserModel._();
+
+  const factory UserModel({
+    required String id,
+    @JsonKey(name: 'full_name') required String fullName,
+    required String email,
+    @JsonKey(name: 'employee_code') required String employeeCode,
+    @JsonKey(name: 'avatar_url') String? avatarUrl,
+    @JsonKey(name: 'department_id') String? departmentId,
+    String? position,
+    required String role,
+  }) = _UserModel;
+
+  factory UserModel.fromJson(Map<String, dynamic> json) =>
+      _$UserModelFromJson(_preprocessJson(json));
+
+  static Map<String, dynamic> _preprocessJson(Map<String, dynamic> json) {
+    final Map<String, dynamic> data = Map.from(json);
+
+    // Handle role fallback
+    if (data['role'] == null && data['account'] != null) {
+      data['role'] = data['account']['role'];
+    }
+    data['role'] ??= 'USER';
+
+    // Ensure ID is String
+    if (data['id'] != null) {
+      data['id'] = data['id'].toString();
+    }
+
+    // Ensure departmentId is String
+    if (data['department_id'] != null) {
+      data['department_id'] = data['department_id'].toString();
+    }
+
+    return data;
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'full_name': fullName,
-      'email': email,
-      'employee_code': employeeCode,
-      'avatar_url': avatarUrl,
-      'department_id': departmentId,
-      'position': position,
-      'account': {'role': role},
-    };
-  }
+  @override
+  List<Object?> get props => [
+        id,
+        fullName,
+        email,
+        employeeCode,
+        avatarUrl,
+        departmentId,
+        position,
+        role,
+      ];
+
+  @override
+  bool? get stringify => true;
 }

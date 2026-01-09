@@ -6,9 +6,9 @@ part of 'dashboard_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-DashboardSummaryModel _$DashboardSummaryModelFromJson(
+_DashboardSummaryModel _$DashboardSummaryModelFromJson(
         Map<String, dynamic> json) =>
-    DashboardSummaryModel(
+    _DashboardSummaryModel(
       totalAssets: (json['totalAssets'] as num).toInt(),
       activeAssets: (json['activeAssets'] as num).toInt(),
       inactiveAssets: (json['inactiveAssets'] as num).toInt(),
@@ -21,7 +21,7 @@ DashboardSummaryModel _$DashboardSummaryModelFromJson(
     );
 
 Map<String, dynamic> _$DashboardSummaryModelToJson(
-        DashboardSummaryModel instance) =>
+        _DashboardSummaryModel instance) =>
     <String, dynamic>{
       'totalAssets': instance.totalAssets,
       'activeAssets': instance.activeAssets,
@@ -34,25 +34,25 @@ Map<String, dynamic> _$DashboardSummaryModelToJson(
       'userCount': instance.userCount,
     };
 
-AssetStatusReportModel _$AssetStatusReportModelFromJson(
+_AssetStatusReportModel _$AssetStatusReportModelFromJson(
         Map<String, dynamic> json) =>
-    AssetStatusReportModel(
+    _AssetStatusReportModel(
       status: json['status'] as String,
       count: (json['count'] as num).toInt(),
       percentage: (json['percentage'] as num).toDouble(),
     );
 
 Map<String, dynamic> _$AssetStatusReportModelToJson(
-        AssetStatusReportModel instance) =>
+        _AssetStatusReportModel instance) =>
     <String, dynamic>{
       'status': instance.status,
       'count': instance.count,
       'percentage': instance.percentage,
     };
 
-AssetCategoryReportModel _$AssetCategoryReportModelFromJson(
+_AssetCategoryReportModel _$AssetCategoryReportModelFromJson(
         Map<String, dynamic> json) =>
-    AssetCategoryReportModel(
+    _AssetCategoryReportModel(
       categoryId: json['categoryId'] as String,
       categoryName: json['categoryName'] as String,
       count: (json['count'] as num).toInt(),
@@ -61,7 +61,7 @@ AssetCategoryReportModel _$AssetCategoryReportModelFromJson(
     );
 
 Map<String, dynamic> _$AssetCategoryReportModelToJson(
-        AssetCategoryReportModel instance) =>
+        _AssetCategoryReportModel instance) =>
     <String, dynamic>{
       'categoryId': instance.categoryId,
       'categoryName': instance.categoryName,
@@ -70,34 +70,31 @@ Map<String, dynamic> _$AssetCategoryReportModelToJson(
       'percentage': instance.percentage,
     };
 
-AssignmentReportModel _$AssignmentReportModelFromJson(
+_AssignmentReportModel _$AssignmentReportModelFromJson(
         Map<String, dynamic> json) =>
-    AssignmentReportModel(
+    _AssignmentReportModel(
       id: json['id'] as String,
-      assetCode: json['assetCode'] as String,
+      assetCode: json['assetCode'] as String? ?? 'N/A',
       assetName: json['assetName'] as String,
-      assignedTo: json['assignedTo'] as String,
-      status: json['status'] as String,
-      createdAt: DateTime.parse(json['createdAt'] as String),
+      assignedTo: json['assignedToName'] as String,
+      status: json['status'] as String? ?? 'PENDING',
+      createdAt: DateTime.parse(json['created_at'] as String),
     );
 
 Map<String, dynamic> _$AssignmentReportModelToJson(
-        AssignmentReportModel instance) =>
+        _AssignmentReportModel instance) =>
     <String, dynamic>{
       'id': instance.id,
       'assetCode': instance.assetCode,
       'assetName': instance.assetName,
-      'assignedTo': instance.assignedTo,
+      'assignedToName': instance.assignedTo,
       'status': instance.status,
-      'createdAt': instance.createdAt.toIso8601String(),
+      'created_at': instance.createdAt.toIso8601String(),
     };
 
-AssignmentMetricsModel _$AssignmentMetricsModelFromJson(
+_AssignmentMetricsModel _$AssignmentMetricsModelFromJson(
         Map<String, dynamic> json) =>
-    AssignmentMetricsModel(
-      data: (json['data'] as List<dynamic>)
-          .map((e) => AssignmentReportModel.fromJson(e as Map<String, dynamic>))
-          .toList(),
+    _AssignmentMetricsModel(
       total: (json['total'] as num).toInt(),
       totalAccepted: (json['totalAccepted'] as num).toInt(),
       totalPending: (json['totalPending'] as num).toInt(),
@@ -105,18 +102,56 @@ AssignmentMetricsModel _$AssignmentMetricsModelFromJson(
     );
 
 Map<String, dynamic> _$AssignmentMetricsModelToJson(
-        AssignmentMetricsModel instance) =>
+        _AssignmentMetricsModel instance) =>
     <String, dynamic>{
-      'data': instance.data,
       'total': instance.total,
       'totalAccepted': instance.totalAccepted,
       'totalPending': instance.totalPending,
       'totalRejected': instance.totalRejected,
     };
 
-CategoryMetricsModel _$CategoryMetricsModelFromJson(
+_InvoiceMetricsModel _$InvoiceMetricsModelFromJson(Map<String, dynamic> json) =>
+    _InvoiceMetricsModel(
+      total: (json['total'] as num).toInt(),
+      totalPaid: (json['totalPaid'] as num).toInt(),
+      totalPending: (json['totalPending'] as num).toInt(),
+      totalOverdue: (json['totalOverdue'] as num).toInt(),
+      totalDraft: (json['totalDraft'] as num).toInt(),
+    );
+
+Map<String, dynamic> _$InvoiceMetricsModelToJson(
+        _InvoiceMetricsModel instance) =>
+    <String, dynamic>{
+      'total': instance.total,
+      'totalPaid': instance.totalPaid,
+      'totalPending': instance.totalPending,
+      'totalOverdue': instance.totalOverdue,
+      'totalDraft': instance.totalDraft,
+    };
+
+_MaintenanceMetricsModel _$MaintenanceMetricsModelFromJson(
         Map<String, dynamic> json) =>
-    CategoryMetricsModel(
+    _MaintenanceMetricsModel(
+      total: (json['total'] as num).toInt(),
+      totalCompleted: (json['totalCompleted'] as num).toInt(),
+      totalInProgress: (json['totalInProgress'] as num).toInt(),
+      totalScheduled: (json['totalScheduled'] as num).toInt(),
+      totalFailed: (json['totalFailed'] as num).toInt(),
+    );
+
+Map<String, dynamic> _$MaintenanceMetricsModelToJson(
+        _MaintenanceMetricsModel instance) =>
+    <String, dynamic>{
+      'total': instance.total,
+      'totalCompleted': instance.totalCompleted,
+      'totalInProgress': instance.totalInProgress,
+      'totalScheduled': instance.totalScheduled,
+      'totalFailed': instance.totalFailed,
+    };
+
+_CategoryMetricsModel _$CategoryMetricsModelFromJson(
+        Map<String, dynamic> json) =>
+    _CategoryMetricsModel(
       data: (json['data'] as List<dynamic>)
           .map((e) =>
               AssetCategoryReportModel.fromJson(e as Map<String, dynamic>))
@@ -125,7 +160,7 @@ CategoryMetricsModel _$CategoryMetricsModelFromJson(
     );
 
 Map<String, dynamic> _$CategoryMetricsModelToJson(
-        CategoryMetricsModel instance) =>
+        _CategoryMetricsModel instance) =>
     <String, dynamic>{
       'data': instance.data,
       'total': instance.total,

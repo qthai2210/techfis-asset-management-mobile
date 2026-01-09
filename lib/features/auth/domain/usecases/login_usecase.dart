@@ -1,10 +1,10 @@
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 import 'package:injectable/injectable.dart';
-import '../../../../core/error/failures.dart';
-import '../../../../core/usecases/usecase.dart';
-import '../entities/user.dart';
-import '../repositories/auth_repository.dart';
+import 'package:techfis_asset_management_mobile/core/error/failures.dart';
+import 'package:techfis_asset_management_mobile/core/usecases/usecase.dart';
+import 'package:techfis_asset_management_mobile/features/auth/domain/entities/user.dart';
+import 'package:techfis_asset_management_mobile/features/auth/domain/repositories/auth_repository.dart';
 
 @lazySingleton
 class LoginUseCase implements UseCase<User, LoginParams> {

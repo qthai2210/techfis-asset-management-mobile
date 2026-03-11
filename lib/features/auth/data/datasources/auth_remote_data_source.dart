@@ -3,6 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:injectable/injectable.dart';
 import 'package:techfis_asset_management_mobile/core/error/exceptions.dart';
 import 'package:techfis_asset_management_mobile/core/constants/api_constants.dart';
+import 'package:techfis_asset_management_mobile/core/network/dio_client.dart';
 import 'package:techfis_asset_management_mobile/features/auth/data/models/user_model.dart';
 
 abstract class AuthRemoteDataSource {
@@ -13,7 +14,7 @@ abstract class AuthRemoteDataSource {
 
 @LazySingleton(as: AuthRemoteDataSource)
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
-  final Dio client;
+  final DioClient client;
   final FlutterSecureStorage storage;
 
   AuthRemoteDataSourceImpl(this.client, this.storage);

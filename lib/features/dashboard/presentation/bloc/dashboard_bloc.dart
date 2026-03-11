@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:techfis_asset_management_mobile/core/usecases/usecase.dart';
 import 'package:techfis_asset_management_mobile/features/dashboard/domain/usecases/get_dashboard_data_usecase.dart';
+import 'package:techfis_asset_management_mobile/core/utils/failure_mapper.dart';
 
 // EVENTS
 abstract class DashboardEvent extends Equatable {
@@ -63,7 +64,8 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
     emit(DashboardLoading());
     final result = await getDashboardData(NoParams());
     result.fold(
-      (failure) => emit(const DashboardError('Failed to load dashboard data')),
+      (failure) =>
+          emit(DashboardError(FailureMapper.mapFailureToMessage(failure))),
       (data) => emit(DashboardLoaded(data)),
     );
   }
@@ -77,7 +79,8 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
     // emit(DashboardLoading()); // Optional: don't clear UI on refresh
     final result = await getDashboardData(NoParams());
     result.fold(
-      (failure) => emit(const DashboardError('Failed to refresh data')),
+      (failure) =>
+          emit(DashboardError(FailureMapper.mapFailureToMessage(failure))),
       (data) => emit(DashboardLoaded(data)),
     );
   }

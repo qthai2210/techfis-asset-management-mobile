@@ -5,8 +5,9 @@ class AppConstants {
   static const int receiveTimeout = 30; // seconds
 
   // Pagination
-  static const int defaultPageSize = 10;
+  static const int defaultPageSize = 20;
   static const int maxPageSize = 100;
+  static const int recentItemsLimit = 5;
 
   // Base URLs (Environment-based)
   static const String devBaseUrl = String.fromEnvironment(

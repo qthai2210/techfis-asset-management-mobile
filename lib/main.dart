@@ -22,7 +22,6 @@ void main() async {
   await GlobalErrorHandler.initialize(
     () async {
       WidgetsFlutterBinding.ensureInitialized();
-
       await Hive.initFlutter();
       Hive.registerAdapter(AssetModelAdapter());
 

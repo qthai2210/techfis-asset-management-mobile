@@ -1,8 +1,9 @@
 import 'package:flutter/foundation.dart';
-import 'package:dio/dio.dart';
+import 'package:techfis_asset_management_mobile/core/network/dio_client.dart';
 import 'package:injectable/injectable.dart';
-import 'package:techfis_asset_management_mobile/core/error/exceptions.dart';
 import 'package:techfis_asset_management_mobile/core/constants/api_constants.dart';
+import 'package:techfis_asset_management_mobile/core/constants/app_constants.dart';
+import 'package:techfis_asset_management_mobile/core/error/exceptions.dart';
 import 'package:techfis_asset_management_mobile/features/dashboard/data/models/dashboard_model.dart';
 
 abstract class DashboardRemoteDataSource {
@@ -17,7 +18,7 @@ abstract class DashboardRemoteDataSource {
 
 @LazySingleton(as: DashboardRemoteDataSource)
 class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
-  final Dio dio;
+  final DioClient dio;
 
   DashboardRemoteDataSourceImpl(this.dio);
 
@@ -80,7 +81,10 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
     try {
       final response = await dio.get(
         ApiConstants.assignments,
-        queryParameters: {'take': 5, 'sort': 'createdAt:desc'},
+        queryParameters: {
+          'take': AppConstants.recentItemsLimit,
+          'sort': 'createdAt:desc',
+        },
       );
       final data = response.data['data']['data'];
       if (data is List) {

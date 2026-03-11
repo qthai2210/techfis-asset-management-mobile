@@ -5,6 +5,7 @@ import 'package:techfis_asset_management_mobile/core/constants/api_constants.dar
 import 'package:techfis_asset_management_mobile/core/network/models/base_response.dart';
 import 'package:techfis_asset_management_mobile/core/network/models/paginated_data.dart';
 import 'package:techfis_asset_management_mobile/features/assets/data/models/asset_model.dart';
+import 'package:techfis_asset_management_mobile/core/network/dio_client.dart';
 
 abstract class AssetRemoteDataSource {
   Future<List<AssetModel>> getAssets({
@@ -19,7 +20,7 @@ abstract class AssetRemoteDataSource {
 
 @LazySingleton(as: AssetRemoteDataSource)
 class AssetRemoteDataSourceImpl implements AssetRemoteDataSource {
-  final Dio client;
+  final DioClient client;
 
   AssetRemoteDataSourceImpl(this.client);
 

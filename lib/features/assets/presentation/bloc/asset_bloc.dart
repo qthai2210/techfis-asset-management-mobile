@@ -1,5 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
+import 'package:techfis_asset_management_mobile/core/constants/app_constants.dart';
+import 'package:techfis_asset_management_mobile/core/utils/failure_mapper.dart';
 import 'package:techfis_asset_management_mobile/features/assets/domain/entities/asset.dart';
 import 'package:techfis_asset_management_mobile/features/assets/domain/usecases/get_asset_detail.dart';
 import 'package:techfis_asset_management_mobile/features/assets/domain/usecases/get_assets.dart';
@@ -37,17 +39,17 @@ class AssetBloc extends Bloc<AssetEvent, AssetState> {
 
     final result = await getAssets(GetAssetsParams(
       page: page,
-      limit: event.limit ?? 20,
+      limit: event.limit ?? AppConstants.defaultPageSize,
       search: event.search,
       status: event.status,
       categoryId: event.categoryId,
     ));
 
     result.fold(
-      (failure) => emit(const AssetError('Failed to load assets')),
+      (failure) => emit(AssetError(FailureMapper.mapFailureToMessage(failure))),
       (newAssets) {
-        final isMax =
-            newAssets.isEmpty || newAssets.length < (event.limit ?? 20);
+        final isMax = newAssets.isEmpty ||
+            newAssets.length < (event.limit ?? AppConstants.defaultPageSize);
         emit(AssetsLoaded(
           assets: page == 1 ? newAssets : currentAssets + newAssets,
           hasReachedMax: isMax,
@@ -64,7 +66,7 @@ class AssetBloc extends Bloc<AssetEvent, AssetState> {
     emit(AssetLoading());
     final result = await getAssetDetail(GetAssetDetailParams(id: event.id));
     result.fold(
-      (failure) => emit(const AssetError('Failed to load asset detail')),
+      (failure) => emit(AssetError(FailureMapper.mapFailureToMessage(failure))),
       (asset) => emit(AssetDetailLoaded(asset)),
     );
   }

@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:injectable/injectable.dart';
+import 'package:techfis_asset_management_mobile/core/utils/failure_mapper.dart';
 import 'package:techfis_asset_management_mobile/features/auth/domain/entities/user.dart';
 import 'package:techfis_asset_management_mobile/features/auth/domain/usecases/login_usecase.dart';
 import 'package:techfis_asset_management_mobile/features/auth/domain/repositories/auth_repository.dart';
@@ -31,7 +32,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       LoginParams(username: event.username, password: event.password),
     );
     result.fold(
-      (failure) => emit(AuthError(failure.message)),
+      (failure) => emit(AuthError(FailureMapper.mapFailureToMessage(failure))),
       (user) => emit(AuthAuthenticated(user)),
     );
   }

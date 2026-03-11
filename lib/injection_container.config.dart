@@ -9,7 +9,6 @@
 // coverage:ignore-file
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:dio/dio.dart' as _i361;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart' as _i558;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:hive/hive.dart' as _i979;
@@ -18,6 +17,8 @@ import 'package:internet_connection_checker/internet_connection_checker.dart'
     as _i973;
 import 'package:techfis_asset_management_mobile/core/network/auth_interceptor.dart'
     as _i623;
+import 'package:techfis_asset_management_mobile/core/network/dio_client.dart'
+    as _i420;
 import 'package:techfis_asset_management_mobile/core/network/network_info.dart'
     as _i754;
 import 'package:techfis_asset_management_mobile/core/network/network_module.dart'
@@ -115,17 +116,17 @@ extension GetItInjectableX on _i174.GetIt {
         () => _i754.NetworkInfoImpl(gh<_i973.InternetConnectionChecker>()));
     gh.lazySingleton<_i871.LanguageRepository>(() =>
         _i558.LanguageRepositoryImpl(gh<_i901.LanguageLocalDataSource>()));
-    gh.lazySingleton<_i361.Dio>(
-        () => networkModule.dio(gh<_i623.AuthInterceptor>()));
+    gh.lazySingleton<_i420.DioClient>(
+        () => _i420.DioClient(gh<_i623.AuthInterceptor>()));
+    gh.lazySingleton<_i486.AssetRemoteDataSource>(
+        () => _i486.AssetRemoteDataSourceImpl(gh<_i420.DioClient>()));
     gh.factory<_i113.LanguageBloc>(
         () => _i113.LanguageBloc(gh<_i871.LanguageRepository>()));
     gh.lazySingleton<_i226.DashboardRemoteDataSource>(
-        () => _i226.DashboardRemoteDataSourceImpl(gh<_i361.Dio>()));
-    gh.lazySingleton<_i486.AssetRemoteDataSource>(
-        () => _i486.AssetRemoteDataSourceImpl(gh<_i361.Dio>()));
+        () => _i226.DashboardRemoteDataSourceImpl(gh<_i420.DioClient>()));
     gh.lazySingleton<_i692.AuthRemoteDataSource>(
         () => _i692.AuthRemoteDataSourceImpl(
-              gh<_i361.Dio>(),
+              gh<_i420.DioClient>(),
               gh<_i558.FlutterSecureStorage>(),
             ));
     gh.lazySingleton<_i644.AssetRepository>(() => _i730.AssetRepositoryImpl(
